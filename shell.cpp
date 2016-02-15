@@ -7,7 +7,6 @@
 #include <ctype.h>
 #include <cstring>
 
-int count = 0;
 
 void executer(char **args) {
 	pid_t pid;
@@ -19,8 +18,7 @@ void executer(char **args) {
 	} else if (pid == 0) {
 		//printf("\n");
 		execvp(*args, args);
-			printf("ERROR: Exec failed\n");
-			exit(1);
+		exit(1);
 		}
 		else {
 			while(wait(&cur_status) != pid);
@@ -33,7 +31,6 @@ void parse(char *input, char **args) {
 			*input++ = '\0';
 		}
 		*args++ = input;
-		count++;
 		while (*input != '\0' && *input != ' ') {
 			input++;
 		}
@@ -47,11 +44,17 @@ int main() {
 
 	while(1) {
 		printf("$> ");
-		gets(input);
+		fgets(input, 80, stdin);
+		int len = strlen(input);
+		if( input[len-1] == '\n')
+			input[len-1] = 0;
 		parse(input, args);
 		if (strcmp(args[0], "exit") == 0) {
+			printf("Bye\n");
 			exit(0);
 		}
+		if (strcmp (args[0], " ") == 0)
+			continue;
 		/*for (int i = 0; i < count; i++) {
 			printf("%s\n", args[i]);
 		}*/
