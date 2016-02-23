@@ -50,7 +50,7 @@ void executer(char **args, char* infile, char* outfile, int a, int b, int pipe) 
 void pipe_executer(char **args, char* infile, char* outfile, int a, int b, int c, std::vector<char**> pipe_args) {
 	if(c == 1) {
 		int pipes[2];
-		int pid, cur_status;
+		int pid, cur_status, pid2;
 		pipe(pipes);
 		pid = fork();
 
@@ -59,13 +59,14 @@ void pipe_executer(char **args, char* infile, char* outfile, int a, int b, int c
 			close(pipes[1]);
 			executer(pipe_args[1], infile, outfile, a, 0, 1);
 		} else {
-			if (fork() == 0) {
+			if ((pid2 = fork()) == 0) {
 				dup2(pipes[1], 1);
 				close(pipes[0]);
 				executer(pipe_args[0], infile, outfile, 0, b, 1);
 			} else {
-				sleep(1);			
+				while(wait(&cur_status) != pid2);		
 			}
+			sleep(1);
 		}
 	}
 }
@@ -105,8 +106,7 @@ int main() {
 			printf("Bye\n");
 			exit(0);
 		}
-		arg_list[0] = args[0];
-		int i = 1;
+		int i = 0;
 		int outflag = 0, inflag = 0;
 		while(args[i]) {
 			if (strcmp(args[i], ">") == 0) {
@@ -134,7 +134,8 @@ int main() {
 		}	
 		char *arg_temp2[80];
 
-		std::copy(arg_list + count, arg_list + 80, arg_temp2);
+		std::copy(arg_list + 1, arg_list + 80, arg_temp2);
+		arg_temp2[i] = NULL;
 		groups.push_back(arg_temp2);
 
 		arg_list[i] = NULL;
