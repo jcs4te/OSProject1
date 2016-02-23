@@ -48,6 +48,13 @@ void executer(char **args, char* infile, char* outfile, int a, int b, int pipe) 
 }
 
 void pipe_executer(char **args, char* infile, char* outfile, int a, int b, int c, std::vector<char**> pipe_args) {
+	// if(pipe_args[0][0] != NULL) printf("%s\n", pipe_args[0][0]);
+	// if(pipe_args[0][1] != NULL) printf("%s\n", pipe_args[0][1]);
+	// if(pipe_args[0][2] != NULL) printf("%s\n", pipe_args[0][2]);
+	// if(pipe_args[0][3] != NULL) printf("%s\n", pipe_args[0][3]);	
+	// if(pipe_args[1][0] != NULL) printf("%s\n", pipe_args[1][0]);
+	// if(pipe_args[1][1] != NULL) printf("%s\n", pipe_args[1][1]);
+
 	if(c == 1) {
 		int pipes[2];
 		int pid, cur_status, pid2;
@@ -87,13 +94,21 @@ int main() {
 
 	char input[80];
 	int fin, fout, stat;
-	pid_t pid;
+	int pid;
 	char *inf = "";
 	char *outf = "";
+	int pid2, pid3, cur_status;
 
 	while(1) {
 		char *args[80];
 		char *arg_list[80];
+		
+		for(int i = 0; i < 80; i++) {
+			arg_list[i] = '\0';
+		}
+
+		arg_list[80] = NULL;
+
 		std::vector<char**> groups;
 		int pipecount = 0, count = 0;
 		printf("$> ");
@@ -108,6 +123,7 @@ int main() {
 		}
 		int i = 0;
 		int outflag = 0, inflag = 0;
+		
 		while(args[i]) {
 			if (strcmp(args[i], ">") == 0) {
 				outf = args[i+1];
@@ -115,7 +131,7 @@ int main() {
 				i++;
 				break;
 			} else if (pipecount == 0 && strcmp(args[i], "<") == 0) {
-				inf = args[i+1];
+				inf = args[i];
 				inflag = 1;
 			} else if (strcmp(args[i], "|") == 0) {
 				char *arg_temp[80];
