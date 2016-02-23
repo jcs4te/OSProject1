@@ -15,6 +15,7 @@
 
 
 void executer(char **args, char* infile, char* outfile, int a, int b, int pipe) {
+	printf("Normal Executer\n");
 	int pid;
 	char *envp[] = {NULL};
 	int cur_status, fin, fout;
@@ -48,9 +49,10 @@ void executer(char **args, char* infile, char* outfile, int a, int b, int pipe) 
 }
 
 void pipe_executer(char **args, char* infile, char* outfile, int a, int b, int c, std::vector<char**> pipe_args) {
+	printf("Pipe Executer\n");
 	if(c == 1) {
 		int pipes[2];
-		int pid, cur_status;
+		int pid, cur_status, pid2;
 		pipe(pipes);
 		pid = fork();
 
@@ -59,14 +61,15 @@ void pipe_executer(char **args, char* infile, char* outfile, int a, int b, int c
 			close(pipes[1]);
 			executer(pipe_args[1], infile, outfile, a, 0, 1);
 		} else {
-			if (fork() == 0) {
+			pid2 = fork();
+			if (pid2 == 0) {
 				dup2(pipes[1], 1);
 				close(pipes[0]);
 				executer(pipe_args[0], infile, outfile, 0, b, 1);
 			} else {
-				sleep(1);			
+				while(wait(&cur_status) != pid2);			
 			}
-		}
+		} 
 	}
 }
 
@@ -135,6 +138,7 @@ int main() {
 		char *arg_temp2[80];
 
 		std::copy(arg_list + count, arg_list + 80, arg_temp2);
+		arg_temp2[i] = NULL;
 		groups.push_back(arg_temp2);
 
 		arg_list[i] = NULL;
